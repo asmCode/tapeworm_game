@@ -42,9 +42,18 @@ public class TapewormView : MonoBehaviour
 			moveValue = -8.0f;
 		}
 
+		/*
 		Vector3 firstSegPos = m_segments[0].transform.position;
 		firstSegPos.y += moveValue * Time.deltaTime;
 		m_segments[0].transform.position = firstSegPos;
+		*/
+
+		if (Input.GetMouseButton(0))
+		{
+			Vector3 firstSegPos = m_segments[0].transform.position;
+			firstSegPos.y = (Input.mousePosition.y - (Screen.width / 2)) * 0.05f;
+			m_segments[0].transform.position = firstSegPos;
+		}
 
 		UpdateSegments();
 	}
@@ -70,19 +79,36 @@ public class TapewormView : MonoBehaviour
 
 	private void UpdateSegments()
 	{
+		/*
 		for (int i = 1; i < m_segments.Count; i++)
 		{
 			Vector3 currentPosition = m_segments[i].transform.position;
 
 			float heightDiff = m_segments[i - 1].transform.position.y - currentPosition.y;
 
-			currentPosition.y += Mathf.Min(heightDiff * Mathf.Sign(heightDiff), Mathf.Sign(heightDiff) * 10.0f * Time.deltaTime);
+			currentPosition.y += Mathf.Min(heightDiff * Mathf.Sign(heightDiff), Mathf.Sign(heightDiff) * 1.0f * Time.deltaTime);
 			m_segments[i].transform.position = currentPosition;
 
 			Vector3 direction = m_segments[i].transform.position - m_segments[i - 1].transform.position;
 
 			m_segments[i].transform.position =
 				m_segments[i - 1].transform.position + direction.normalized * SegmentsDistance;
+		}
+		*/
+
+
+		float speed = 1.0f;
+
+		for (int i = 1; i < m_segments.Count; i++)
+		{
+			Vector3 currentPosition = m_segments[i].transform.position;
+			
+			float heightDiff = m_segments[i - 1].transform.position.y - currentPosition.y;
+
+			speed = heightDiff * heightDiff * 10.0f;
+			
+			currentPosition.y += Mathf.Min(heightDiff * Mathf.Sign(heightDiff), speed * Mathf.Sign(heightDiff) * Time.deltaTime);
+			m_segments[i].transform.position = currentPosition;
 		}
 	}
 }

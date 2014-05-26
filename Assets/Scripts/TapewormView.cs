@@ -66,7 +66,7 @@ public class TapewormView : MonoBehaviour
 		float moveValue = m_move;
 
 
-		if (Input.GetKey(KeyCode.UpArrow))
+		/*if (Input.GetKey(KeyCode.UpArrow))
 		{
 			moveValue = 8.0f;
 		}
@@ -74,11 +74,13 @@ public class TapewormView : MonoBehaviour
 		if (Input.GetKey(KeyCode.DownArrow))
 		{
 			moveValue = -8.0f;
-		}
+		}*/
 
+		/*
 		Vector3 firstSegPos = m_segments[0].transform.position;
 		firstSegPos.y += moveValue * Time.deltaTime;
 		m_segments[0].transform.position = firstSegPos;
+		*/
 
 		/*
 		if (Input.GetMouseButton(0))
@@ -87,8 +89,16 @@ public class TapewormView : MonoBehaviour
 			firstSegPos.y = (Input.mousePosition.y - (Screen.width / 2)) * 0.05f;
 			m_segments[0].transform.position = firstSegPos;
 		}
-		*/
 
+*/
+		Vector3 viewportMousePosition = Camera.main.ScreenToViewportPoint(Input.mousePosition);
+		Vector3 worldMousePosition = Camera.main.ScreenPointToRay(Input.mousePosition).origin;
+
+		Vector3 firstSegPos = m_segments[0].transform.position;
+		firstSegPos.x = worldMousePosition.x * 1.0f;
+		firstSegPos.y = worldMousePosition.y * 1.0f;
+		m_segments[0].transform.position = firstSegPos;
+		
 		m_updateMovementCooldown += Time.deltaTime;
 		if (m_updateMovementCooldown >= SegmentMovementDelay)
 		{
@@ -120,6 +130,9 @@ public class TapewormView : MonoBehaviour
 
 	private void UpdateSegments()
 	{
+		//Debug.Log(string.Format("{0} {1}", Input.mousePosition.x, Input.mousePosition.y));
+		//Debug.Log(string.Format("{0} {1}", Camera.main.ScreenToViewportPoint(Input.mousePosition).x, Camera.main.ScreenToViewportPoint(Input.mousePosition).y));
+
 		/*
 		for (int i = 1; i < m_segments.Count; i++)
 		{
@@ -142,31 +155,16 @@ public class TapewormView : MonoBehaviour
 		for (int i = 1; i < m_segments.Count; i++)
 		{
 			Vector3 currentPosition = m_segments[i].transform.position;
-			
-			float heightDiff = m_segments[i - 1].transform.position.y - currentPosition.y;
+			Vector3 destinationPosition = m_segments[i - 1].transform.position;
+			destinationPosition.z = currentPosition.z;
 
-			//speed = 1.5f;//heightDiff * heightDiff * 20.0f;
-			speed = heightDiff * heightDiff * 20.0f;
+			Vector3 currentVelocity = m_segments[i].CurrentVelocity;
 
-			float deltaShift = speed * Time.deltaTime;
+			//currentPosition.y = Mathf.SmoothDampAngle(currentPosition.y, m_segments[i - 1].transform.position.y, ref currentVelocity, 0.08f);
+			currentPosition = Vector3.SmoothDamp(currentPosition, destinationPosition, ref currentVelocity, 0.1f);
 
-			if (Mathf.Abs(deltaShift) > Mathf.Abs(heightDiff))
-			{
-				if (heightDiff > 0.0f)
-					currentPosition.y += heightDiff;
-				else if (heightDiff < 0.0f)
-					currentPosition.y += heightDiff;
-			}
-			else
-			{
-				if (heightDiff > 0.0f)
-					currentPosition.y += deltaShift;
-				else if (heightDiff < 0.0f)
-					currentPosition.y -= deltaShift;
-			}
-		
-			//currentPosition.y += Mathf.Min(Mathf.Abs(heightDiff), speed * Time.deltaTime) * Mathf.Sign(heightDiff);
-			//currentPosition.y += speed * Time.deltaTime * Mathf.Sign(heightDiff);
+			m_segments[i].CurrentVelocity = currentVelocity;
+
 			m_segments[i].transform.position = currentPosition;
 		}
 	}

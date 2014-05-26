@@ -5,10 +5,16 @@ using System.Collections.Generic;
 public class TapewormView : MonoBehaviour
 {
 	private static readonly float SegmentsDistance = 2.0f;
+	private static readonly float SegmentMovementDelay = 0.05f;
+
+	public ButtonBehavior m_down;
+	public ButtonBehavior m_up;
 
 	public TapewormSegment m_tapewormSegmentPrefab;
 
 	private List<TapewormSegment> m_segments;
+
+	private float m_updateMovementCooldown;
 
 	void Start()
 	{
@@ -26,11 +32,39 @@ public class TapewormView : MonoBehaviour
 		AddSegment();
 		AddSegment();
 		AddSegment();
+
+		m_down.Pressed += HandleDownPressed;
+		m_down.Released += HandleDownReleased;
+		m_up.Pressed += HandleUpPressed;
+		m_up.Released += HandleUpReleased;
+	}
+
+	float m_move;
+
+	void HandleDownReleased (object sender)
+	{
+		m_move = 0.0f;
+	}
+
+	void HandleUpReleased (object sender)
+	{
+		m_move = 0.0f;
+	}
+
+	void HandleUpPressed (object sender)
+	{
+		m_move = 8.0f;
+	}
+
+	void HandleDownPressed (object sender)
+	{
+		m_move = -8.0f;
 	}
 
 	void Update()
 	{
-		float moveValue = 0;
+		float moveValue = m_move;
+
 
 		if (Input.GetKey(KeyCode.UpArrow))
 		{
@@ -42,17 +76,24 @@ public class TapewormView : MonoBehaviour
 			moveValue = -8.0f;
 		}
 
-		/*
 		Vector3 firstSegPos = m_segments[0].transform.position;
 		firstSegPos.y += moveValue * Time.deltaTime;
 		m_segments[0].transform.position = firstSegPos;
-		*/
 
+		/*
 		if (Input.GetMouseButton(0))
 		{
 			Vector3 firstSegPos = m_segments[0].transform.position;
 			firstSegPos.y = (Input.mousePosition.y - (Screen.width / 2)) * 0.05f;
 			m_segments[0].transform.position = firstSegPos;
+		}
+		*/
+
+		m_updateMovementCooldown += Time.deltaTime;
+		if (m_updateMovementCooldown >= SegmentMovementDelay)
+		{
+			m_updateMovementCooldown = 0.0f;
+			//UpdateSegmentsMovement();
 		}
 
 		UpdateSegments();
@@ -96,7 +137,6 @@ public class TapewormView : MonoBehaviour
 		}
 		*/
 
-
 		float speed = 1.0f;
 
 		for (int i = 1; i < m_segments.Count; i++)
@@ -105,10 +145,39 @@ public class TapewormView : MonoBehaviour
 			
 			float heightDiff = m_segments[i - 1].transform.position.y - currentPosition.y;
 
-			speed = heightDiff * heightDiff * 10.0f;
-			
-			currentPosition.y += Mathf.Min(heightDiff * Mathf.Sign(heightDiff), speed * Mathf.Sign(heightDiff) * Time.deltaTime);
+			//speed = 1.5f;//heightDiff * heightDiff * 20.0f;
+			speed = heightDiff * heightDiff * 20.0f;
+
+			float deltaShift = speed * Time.deltaTime;
+
+			if (Mathf.Abs(deltaShift) > Mathf.Abs(heightDiff))
+			{
+				if (heightDiff > 0.0f)
+					currentPosition.y += heightDiff;
+				else if (heightDiff < 0.0f)
+					currentPosition.y += heightDiff;
+			}
+			else
+			{
+				if (heightDiff > 0.0f)
+					currentPosition.y += deltaShift;
+				else if (heightDiff < 0.0f)
+					currentPosition.y -= deltaShift;
+			}
+		
+			//currentPosition.y += Mathf.Min(Mathf.Abs(heightDiff), speed * Time.deltaTime) * Mathf.Sign(heightDiff);
+			//currentPosition.y += speed * Time.deltaTime * Mathf.Sign(heightDiff);
 			m_segments[i].transform.position = currentPosition;
+		}
+	}
+
+	private void UpdateSegmentsMovement()
+	{
+		for (int i = m_segments.Count - 1; i > 0 ; i--)
+		{
+			Vector3 position = m_segments[i].transform.position;
+			position.y = m_segments[i - 1].transform.position.y;
+			m_segments[i].transform.position = position;
 		}
 	}
 }

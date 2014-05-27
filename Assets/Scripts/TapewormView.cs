@@ -16,6 +16,8 @@ public class TapewormView : MonoBehaviour
 
 	private float m_updateMovementCooldown;
 
+	private AnimationCurveVector2 m_movementCurve;
+
 	void Start()
 	{
 		m_segments = new List<TapewormSegment>();
@@ -37,6 +39,12 @@ public class TapewormView : MonoBehaviour
 		m_down.Released += HandleDownReleased;
 		m_up.Pressed += HandleUpPressed;
 		m_up.Released += HandleUpReleased;
+
+		m_movementCurve = new AnimationCurveVector2();
+		for (int i = 0; i < 100; i++)
+		{
+			m_movementCurve.AddKeyframe((float)i / 100.0f, Vector2.zero);
+		}
 	}
 
 	float m_move;
@@ -98,6 +106,9 @@ public class TapewormView : MonoBehaviour
 		firstSegPos.x = worldMousePosition.x * 1.0f;
 		firstSegPos.y = worldMousePosition.y * 1.0f;
 		m_segments[0].transform.position = firstSegPos;
+
+		m_movementCurve.AddKeyframe(Time.time, new Vector2(m_segments[0].transform.position.x, m_segments[0].transform.position.y));
+		m_movementCurve.RemoveFirstKeyframe();
 		
 		m_updateMovementCooldown += Time.deltaTime;
 		if (m_updateMovementCooldown >= SegmentMovementDelay)
@@ -152,8 +163,12 @@ public class TapewormView : MonoBehaviour
 
 		float speed = 1.0f;
 
+		float timeStep = 0.1f;
+		float timeShift = Time.time - timeStep;
+
 		for (int i = 1; i < m_segments.Count; i++)
 		{
+			/*
 			Vector3 currentPosition = m_segments[i].transform.position;
 			Vector3 destinationPosition = m_segments[i - 1].transform.position;
 			destinationPosition.z = currentPosition.z;
@@ -166,6 +181,14 @@ public class TapewormView : MonoBehaviour
 			m_segments[i].CurrentVelocity = currentVelocity;
 
 			m_segments[i].transform.position = currentPosition;
+			*/
+
+			Vector2 position2 = m_movementCurve.Evaluate(timeShift);
+
+			//Debug.Log(string.Format("{0}, {1}", position2.x, position2.y));
+
+			timeShift -= timeStep;
+			m_segments[i].transform.position = new Vector3(position2.x, position2.y, m_segments[i].transform.position.z);
 		}
 	}
 

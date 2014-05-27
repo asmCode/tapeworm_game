@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 public class TapewormView : MonoBehaviour
 {
-	private static readonly float SegmentsDistance = 2.0f;
+	private static readonly float SegmentsDistance = 1.0f;
 	private static readonly float SegmentMovementDelay = 0.05f;
 
 	public ButtonBehavior m_down;
@@ -189,6 +189,13 @@ public class TapewormView : MonoBehaviour
 
 			timeShift -= timeStep;
 			m_segments[i].transform.position = new Vector3(position2.x, position2.y, m_segments[i].transform.position.z);
+
+			Vector3 directionToNextSegment = m_segments[i].transform.position - m_segments[i - 1].transform.position;
+			m_segments[i - 1].transform.forward = directionToNextSegment.normalized;
+
+			Vector3 scale = m_segments[i - 1].transform.localScale;
+			scale.z = directionToNextSegment.magnitude;
+			m_segments[i - 1].transform.localScale = scale;
 		}
 	}
 

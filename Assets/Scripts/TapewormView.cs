@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 public class TapewormView : MonoBehaviour
 {
-	private static readonly float SegmentsDistance = 1.0f;
+	private static readonly float SegmentsDistance = 0.3f;
 	private static readonly float SegmentMovementDelay = 0.05f;
 
 	public ButtonBehavior m_down;
@@ -22,18 +22,8 @@ public class TapewormView : MonoBehaviour
 	{
 		m_segments = new List<TapewormSegment>();
 
-		AddSegment();
-		AddSegment();
-		AddSegment();
-		AddSegment();
-		AddSegment();
-		AddSegment();
-		AddSegment();
-		AddSegment();
-		AddSegment();
-		AddSegment();
-		AddSegment();
-		AddSegment();
+		for (int i = 0; i < 20; i++)
+			AddSegment();
 
 		m_down.Pressed += HandleDownPressed;
 		m_down.Released += HandleDownReleased;
@@ -100,11 +90,25 @@ public class TapewormView : MonoBehaviour
 
 */
 		Vector3 viewportMousePosition = Camera.main.ScreenToViewportPoint(Input.mousePosition);
+		viewportMousePosition *= 2.0f;
+		viewportMousePosition.x -= 1.0f;
+		viewportMousePosition.y -= 1.0f;
+		if (viewportMousePosition.magnitude > 1.0f)
+			viewportMousePosition.Normalize();
 		Vector3 worldMousePosition = Camera.main.ScreenPointToRay(Input.mousePosition).origin;
 
+		//Debug.Log(string.Format("{0}, {1}", viewportMousePosition.x, viewportMousePosition.y));
+
+		/*
 		Vector3 firstSegPos = m_segments[0].transform.position;
 		firstSegPos.x = worldMousePosition.x * 1.0f;
 		firstSegPos.y = worldMousePosition.y * 1.0f;
+		m_segments[0].transform.position = firstSegPos;
+		*/
+
+		Vector3 firstSegPos = m_segments[0].transform.position;
+		firstSegPos.x = viewportMousePosition.x * 1.0f;
+		firstSegPos.y = viewportMousePosition.y * 1.0f;
 		m_segments[0].transform.position = firstSegPos;
 
 		m_movementCurve.AddKeyframe(Time.time, new Vector2(m_segments[0].transform.position.x, m_segments[0].transform.position.y));
@@ -118,6 +122,20 @@ public class TapewormView : MonoBehaviour
 		}
 
 		UpdateSegments();
+		//FixSegmentsLength();
+	}
+
+	private void FixSegmentsLength()
+	{
+		for (int i = 1; i < m_segments.Count; i++)
+		{
+			Vector3 currentPosition = m_segments[i].transform.position;
+
+			Vector3 direction = m_segments[i].transform.position - m_segments[i - 1].transform.position;
+			
+			m_segments[i].transform.position =
+				m_segments[i - 1].transform.position + direction.normalized * SegmentsDistance;
+		}
 	}
 
 	private void AddSegment()
@@ -189,6 +207,7 @@ public class TapewormView : MonoBehaviour
 
 			timeShift -= timeStep;
 			m_segments[i].transform.position = new Vector3(position2.x, position2.y, m_segments[i].transform.position.z);
+			//m_segments[i].transform.position = new Vector3(position2.x, position2.y, SegmentsDistance * i);
 
 			Vector3 directionToNextSegment = m_segments[i].transform.position - m_segments[i - 1].transform.position;
 			m_segments[i - 1].transform.forward = directionToNextSegment.normalized;

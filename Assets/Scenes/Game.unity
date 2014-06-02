@@ -163,6 +163,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_down: {fileID: 828798380}
   m_up: {fileID: 718712236}
+  m_gestureRecognizer: {fileID: 138699798}
   m_tapewormSegmentPrefab: {fileID: 11400000, guid: 693001e2d7af35544b1d2667b74b2c10,
     type: 2}
 --- !u!4 &98727885
@@ -177,6 +178,45 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 5
+--- !u!1 &138699797
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 138699799}
+  - 114: {fileID: 138699798}
+  m_Layer: 0
+  m_Name: GestureRecognizer
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &138699798
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 138699797}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a6fb3b10e0b2e1744a728eef2adc2dcb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!4 &138699799
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 138699797}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 8
 --- !u!1 &450407385
 GameObject:
   m_ObjectHideFlags: 0
@@ -216,6 +256,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a41435f8135c11042b810fb4af17688e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_collectablesManager: {fileID: 700925860}
+  m_tapewormView: {fileID: 98727884}
 --- !u!1 &552557558
 GameObject:
   m_ObjectHideFlags: 0
@@ -330,9 +372,9 @@ Camera:
     y: 0
     width: 1
     height: 1
-  near clip plane: 1.55999994
+  near clip plane: .879999995
   far clip plane: 1000
-  field of view: 35
+  field of view: 60
   orthographic: 0
   orthographic size: 5
   m_Depth: -1
@@ -353,7 +395,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 691488819}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -2.14792061}
+  m_LocalPosition: {x: 0, y: 0, z: -.910375118}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -398,6 +440,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_foodPrefab: {fileID: 11400000, guid: 2e24a04ec17f3f64dbbc07279cc6234e, type: 2}
+  m_medicinePrefab: {fileID: 11400000, guid: 8f1b5e94566d76c488a16ae6d5dc1d5c, type: 2}
 --- !u!1 &718712231
 GameObject:
   m_ObjectHideFlags: 0
